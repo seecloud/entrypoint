@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = entrypoint
+
+[report]
+ignore_errors = True
