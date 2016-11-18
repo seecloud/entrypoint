@@ -12,8 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import pbr.version
+from entrypoint import args
+from entrypoint import config
+
+__all__ = ["process_entrypoint"]
 
 
-__version__ = pbr.version.VersionInfo(
-    'entrypoint').version_string()
+def process_entrypoint(service_name, default_config_path,
+                       validation_schema=None):
+    parser = args.process_arguments(service_name,
+                                    default_config_path=default_config_path)
+    config.setup_config(validation_schema=validation_schema)
+    return parser
