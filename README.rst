@@ -23,8 +23,8 @@ the library::
     ...
 
 The main assumption is that before to use `CONF` the `process_entrypoint`
-function have to be called to populate it. Riht now there are only two required
-variables, such as `service_name` and `default_config_path`.
+function have to be called to populate it. Right now there are only two
+required variables, such as `service_name` and `default_config_path`.
 
 Be default the entrypoint expect that configuration is present locally but this
 behaviour can be changed through the envrinment variable `ENVIRONMENT`. There
@@ -51,8 +51,8 @@ etcd, it could be done by the next command (for the `ceagle` service)::
 
 Only JSON-serialized configuration is supported.
 
-To run a container for images that use `entrypoint`, you can use the following
-command::
+To run a container from an image that uses `entrypoint`, the following
+command can be used::
 
     cat > ceagle-env-vars <<EOF
     ENVIRONMENT=etcd
