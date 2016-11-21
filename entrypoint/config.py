@@ -21,8 +21,6 @@ from entrypoint import utils
 CONF = {}
 
 SERVICE_CONFIG_KEY = "/{service}/config"
-SERVICE_STATUS_KEY = "/{service}/status"
-SERVICE_ENDPOINTS_KEY = "/{service}/endpoints"
 
 
 def get_local_config():
