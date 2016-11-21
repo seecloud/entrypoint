@@ -11,6 +11,7 @@ The following snippet of the code shows the common usage pattern of
 the library::
 
     import entrypoint
+    from entrypoint import catalog
     from entrypoint import config
 
     CONF = config.CONF
@@ -21,6 +22,15 @@ the library::
         "ceagle", default_config_path="/etc/ceagle/config.json")
 
     ...
+
+    elasticsearch = catalog.get_endpoint("elasticsearch")
+
+    print(endpoint.protocol) #-> None or "http"
+    print(endpoint.address) #-> "127.0.0.1"
+    print(endpoint.port) #-> 8234
+    print(endpoint.url()) #-> "http://127.0.0.1:8234/"
+
+
 
 The main assumption is that before to use `CONF` the `process_entrypoint`
 function have to be called to populate it. Right now there are only two
@@ -100,6 +110,28 @@ Argument               Environment variable         Default value (type)
 --config-file          <SERVICE_NAME>_CONFIG_FILE   <default_config_path> (str)
 =====================  ===========================  =====================================
 
+=========
+Endpoints
+=========
+
+A service have to has a definition of its endpoints in etcd in the following key::
+
+    /<service_name>/endpoints
+
+The only supported format for endpoints is JSON with the next structure::
+
+    {
+        "private": {
+            "protocol": "http",
+            "address": "127.0.0.1",
+            "port": 8000,
+        }
+    }
+
+Where the `private` type of endpoints have to be used for the cross service
+communication. The `protocol` is an optional parameter and in case of using
+the `Endpoint.url` method will be replaced by `"http"`.
+
 ====
 TODO
 ====
@@ -108,4 +140,3 @@ What we want:
 
 * Add support to handle dependencies between services throught.
 * Reporting status of services.
-* Support of services endpoints.
