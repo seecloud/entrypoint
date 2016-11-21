@@ -12,50 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import functools
 import json
-import logging
-import operator
-import time
-
-import etcd
 
 from entrypoint.args import VARIABLES
+from entrypoint import utils
 
-LOG = logging.getLogger(__name__)
 
 CONF = {}
 
 SERVICE_CONFIG_KEY = "/{service}/config"
 SERVICE_STATUS_KEY = "/{service}/status"
 SERVICE_ENDPOINTS_KEY = "/{service}/endpoints"
-
-
-def retry(f):
-    @functools.wraps(f)
-    def decorate(*args, **kwargs):
-        attempts = VARIABLES["etcd"]["attempts"]
-        attempts_delay = VARIABLES["etcd"]["attempts_delay"]
-        for i in range(attempts):
-            try:
-                return f(*args, **kwargs)
-            except etcd.EtcdException as e:
-                LOG.warning("Etcd fails with error on attempt %s/%s: %s",
-                            i, attempts, str(e))
-            time.sleep(attempts_delay)
-        return f(*args, **kwargs)
-    return decorate
-
-
-@retry
-def get_etcd_client():
-    hosts = list(map(operator.itemgetter("address", "port"),
-                     VARIABLES["etcd"]["endpoint"]))
-    hosts_str = ",".join("{0}:{1}".format(*host) for host in hosts)
-    LOG.debug("Using the following etcd hosts: %s", hosts_str)
-    client = etcd.Client(host=tuple(hosts), allow_reconnect=True,
-                         read_timeout=5)
-    return client
 
 
 def get_local_config():
@@ -67,14 +34,14 @@ def get_local_config():
         return json.load(f)
 
 
-@retry
+@utils.retry
 def get_remote_config():
     hosts = VARIABLES["etcd"]["endpoint"]
     if not hosts:
         raise Exception(
             "Could not connect to etcd because hosts were not specified")
     service_name = VARIABLES["service_name"]
-    etcd_client = get_etcd_client()
+    etcd_client = utils.get_etcd_client()
     key = SERVICE_CONFIG_KEY.format(service=service_name)
     config = etcd_client.get(key).value
     return json.loads(config)
